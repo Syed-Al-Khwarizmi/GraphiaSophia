@@ -1,0 +1,116 @@
+<html>
+<head>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vis-network@latest/styles/vis-network.css" type="text/css" />
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vis-network@latest/dist/vis-network.min.js"> </script>
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+
+<style type="text/css">
+
+        #mynetwork {
+            width: 1200px;
+            height: 700px;
+            background-color: #ffffff;
+            border: 1px solid lightgray;
+            position: relative;
+            float: left;
+        }
+
+        
+
+        
+
+        
+</style>
+
+</head>
+
+<body>
+<div id = "mynetwork"></div>
+
+
+<script type="text/javascript">
+
+    // initialize global variables.
+    var edges;
+    var nodes;
+    var network; 
+    var container;
+    var options, data;
+
+    
+    // This method is responsible for drawing the graph, returns the drawn network
+    function drawGraph() {
+        var container = document.getElementById('mynetwork');
+        
+        
+
+        // parsing and collecting nodes and edges from the python
+        nodes = new vis.DataSet([{"color": "#FFC107", "id": "Shahada", "label": "Shahada", "physics": false, "shape": "dot", "title": "Declaration of faith in Allah and Muhammad as his prophet."}, {"color": "#4CAF50", "id": "Salah", "label": "Salah", "physics": false, "shape": "dot", "title": "Performing five daily prayers facing Mecca."}, {"color": "#2196F3", "id": "Zakat", "label": "Zakat", "physics": false, "shape": "dot", "title": "Giving a portion of one\u0027s wealth to the poor and needy."}, {"color": "#9C27B0", "id": "Sawm", "label": "Sawm", "physics": false, "shape": "dot", "title": "Fasting during the month of Ramadan."}, {"color": "#F44336", "id": "Hajj", "label": "Hajj", "physics": false, "shape": "dot", "title": "Pilgrimage to Mecca at least once in a lifetime for those who are able."}]);
+        edges = new vis.DataSet([{"arrowStrikethrough": false, "arrows": "to", "from": "Shahada", "physics": true, "title": "Requires", "to": "Salah"}, {"arrowStrikethrough": false, "arrows": "to", "from": "Salah", "physics": true, "title": "Encourages", "to": "Zakat"}, {"arrowStrikethrough": false, "arrows": "to", "from": "Zakat", "physics": true, "title": "Encourages", "to": "Sawm"}, {"arrowStrikethrough": false, "arrows": "to", "from": "Sawm", "physics": true, "title": "Encourages", "to": "Hajj"}, {"arrowStrikethrough": false, "arrows": "to", "from": "Hajj", "physics": true, "title": "Reaffirms", "to": "Shahada"}]);
+
+        // adding nodes and edges to the graph
+        data = {nodes: nodes, edges: edges};
+
+        var options = {
+    "configure": {
+        "enabled": false
+    },
+    "edges": {
+        "color": {
+            "inherit": true
+        },
+        "smooth": {
+            "enabled": true,
+            "type": "dynamic"
+        }
+    },
+    "interaction": {
+        "dragNodes": true,
+        "hideEdgesOnDrag": false,
+        "hideNodesOnDrag": false
+    },
+    "physics": {
+        "enabled": true,
+        "repulsion": {
+            "centralGravity": 0.011,
+            "damping": 0.2,
+            "nodeDistance": 120,
+            "springConstant": 0.05,
+            "springLength": 120
+        },
+        "solver": "repulsion",
+        "stabilization": {
+            "enabled": true,
+            "fit": true,
+            "iterations": 1000,
+            "onlyDynamicEdges": false,
+            "updateInterval": 50
+        }
+    }
+};
+        
+        
+
+        
+
+        network = new vis.Network(container, data, options);
+	 
+        
+
+
+        
+
+        return network;
+
+    }
+
+    drawGraph();
+
+</script>
+</body>
+</html>
