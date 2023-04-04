@@ -14,36 +14,35 @@ with open('secrets.env') as f:
     openai.api_key = f.readline()
 
 prompt = """
-        Nodes have: Name, Text, Color, Shape.
-        Edges have: Source, Destination, Label.
+    Nodes have the fields: Node Name, Node Text, Node Color, and Node Shape.
+    Edges have the fields: Source, Destination, Label
 
-        A Node contains: 
-        - Name: actual entity name.
-        - Text: small node description.
-        - Color: web-friendly light hex color based on context.
-            
-        An Edge contains:
-        - Source: Name of the source Node.
-        - Destination: Name of the destination Node.
-        - Label: Text relation between the two nodes.
+    A Node contains: 
+    Name: The actual name of the entity.
+    Text: A small description of the node.
+    Color: A web friendly light color in hex format, based on the context.
+    
+    An Edge contains:
+    Source: Name of the source Node.
+    Destination: Name of the destination Node
+    Label: Shows a text relation between the two nodes.
 
-        Markdown bullet format:
-        ### Heading
-        - **Subheading**: detailed explanation bullet points
-            
-        Requirements:
-        - Both Source and Destination MUST be in the Nodes list.
-        - At least 10 nodes are required.
-        - All nodes must be connected through an edge.
-
-        JSON format:
-        {
-            "Response": {
-                "Nodes": [{field: value}],
-                "Edges": [{field: value}],
-                "Text": "Explanation converted to markdown bullet list format"
-            }
+    Text: A markdown bullet format conversion of the explanation in the following format:
+    ### Heading
+    - **Subheading**: List of detailed explanaied bullet points
+    
+    Both Source and Destinations MUST be in the Nodes list.
+    I need at least 10 nodes.
+    
+    The message content should follow the format:
+    {
+        "Response": {
+            "Nodes": [{field: value}],
+            "Edges": [[field: value]],
+            "Text": "Explanation converted into markdown bullet list format"
         }
+    }
+    Only return json objects and text. Every node must be connected to a node through an edge.
     
 """
 
