@@ -14,14 +14,6 @@ logging.info("Starting app.py")
 # Expand the default container width
 st.set_page_config(layout="wide")
 
-# st.title("Mind The Map")
-# st.sidebar.title("Enter what you want to generate a graph for")
-# user_input = st.sidebar.text_input("Enter your text here")
-# if st.sidebar.button("Generate"):
-#     logging.info("Generating graph")
-#     generate_net(prompt=prompt, user=user_input)
-#     logging.info("Graph generated")
-
 with st.container():
     # Add CSS styles to adjust margins and padding
     st.markdown("""
@@ -37,12 +29,14 @@ with st.container():
     """, unsafe_allow_html=True)
     st.title("Mind The Map")
     
-    st.sidebar.title("Output")
-    text_output = st.sidebar.empty()
+    # Create input fields for user input and OpenAI API key
+    # st.sidebar.title("Input")
+    user_input = st.sidebar.text_area("Enter your text here", max_chars=250)
+    openai_api_key = st.sidebar.text_input("Enter your OpenAI API key here")
+    
     # Create a container for the input and button
     input_col, button_col = st.columns([4, 1])
     with input_col:
-        user_input = st.text_input("Enter your text here")
         hide_input_label_css = """
             <style>
             div[data-testid="stText"][role="textbox"] > label {visibility: hidden;}
@@ -52,15 +46,16 @@ with st.container():
     with button_col:
             st.write("") # Add some empty space
             st.write("") # Add some empty space
-            generate_button = st.button("Generate")
+            generate_button = st.sidebar.button("Generate")
 
     # Call generate_net() function when Generate button is clicked
     if generate_button:
         logging.info("Generating graph")
         with st.spinner("Doing something awesome behind the scenes..."):
-            text = generate_net(prompt=prompt, user=user_input)
+            text = generate_net(prompt=prompt, user=user_input, key=openai_api_key)
             logging.info("Graph generated")
-
+            # st.sidebar.title("Output")
+            text_output = st.sidebar.empty()
             text_output.markdown("## Description for " + user_input)
             text_output.markdown(text)
 
