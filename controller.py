@@ -49,7 +49,7 @@ def get_jsons(prompt, user, key):
     try:   
         openai.api_key = key
         resp = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo-0301",
+        model="gpt-3.5-turbo",
         messages=[
                 {"role": "system", "content": prompt},
                 {"role": "user", "content": user},
@@ -69,7 +69,8 @@ def get_jsons(prompt, user, key):
 def generate_net(prompt, user, key):
     node_shape = "dot"
     user = "Scenario: "+user
-    # Default nodes and edges:
+    # Default text, nodes and edges:
+    text = "Uh oh! Something went wrong! Please try again or modify the input a bit."
     nodes = pd.DataFrame(
         {
             "Name": ["Uh Oh!"],
@@ -88,7 +89,7 @@ def generate_net(prompt, user, key):
     )
 
     # Saving default net
-    net = Network("700px", "1200px", directed=True, notebook=False)
+    net = Network("600px", "100%", directed=True, notebook=False)
     for n in nodes.iterrows():
         net.add_node(
             n_id = n[1]['Name'], 
@@ -134,7 +135,7 @@ def generate_net(prompt, user, key):
     logging.info(edges)
 
     try:
-        net = Network("700px", "1200px", directed=True, notebook=False)
+        net = Network("600px", "100%", directed=True, notebook=False)
         net.repulsion(node_distance=120, central_gravity=0.011, spring_length=120, damping=0.2)
         # net.show_buttons(filter_=['physics'])
         for n in nodes.iterrows():
@@ -161,7 +162,7 @@ def generate_net(prompt, user, key):
         print("Graph error")
         pass
     net.save_graph("experiment.html")
-    return text
+    return text, nodes
 
 if __name__ == "__main__":
     generate_net(prompt=prompt, user="")

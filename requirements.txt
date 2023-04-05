@@ -1,0 +1,4 @@
+openai
+streamlit==1.20.0
+pandas
+pyvis
