@@ -58,6 +58,15 @@ with st.container():
 
     # Call generate_net() function when Generate button is clicked
     if generate_button:
+        # Add data validation to the input fields.
+        # If the input fields are empty, show an error message
+        if not user_input:
+            st.error("Please enter your text")
+        if not openai_api_key:
+            st.error("Please enter your OpenAI API key")
+        if not user_input or not openai_api_key:
+            st.stop()
+
         bar_texts = ["Sent stuff to GPT...", "GPT making some cool decisions...", "Creating relationships...", "Generating graph..."]
         logging.info("Generating graph")
         progress_bar = st.progress(0, text="Generating graph...")

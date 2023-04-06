@@ -18,8 +18,8 @@ prompt = """
 
     A Node contains: 
     Name: The actual name of the entity.
-    Text: A small description of the node.
-    Color: A web friendly light color in hex format, based on the context.
+    Text: A small description of the entity.
+    Color: A web friendly dark color in hex format.
     
     An Edge contains:
     Source: Name of the source Node.
