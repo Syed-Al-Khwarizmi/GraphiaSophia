@@ -146,6 +146,7 @@ def generate_net(prompt, user, key):
                 shape = n[1]['Shape'],
                 title = n[1]['Text'],
                 physics = False,
+                borderWidth = 2,
             )
 
         for e in edges.iterrows():
