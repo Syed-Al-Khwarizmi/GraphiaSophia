@@ -55,10 +55,10 @@ def get_jsons(prompt, user, key):
                 {"role": "user", "content": user},
           ],
         max_tokens=3500,
-        temperature=0
+        temperature=1
         )
     except Exception as e:
-        logging.error(str(e))
+        print(str(e))
         print("API error")
         pass
     
