@@ -6,12 +6,17 @@ import concurrent.futures
 import streamlit as st
 import streamlit.components.v1 as components
 from controller import generate_net, prompt
+from controller_pptx import generate_pptx, prompt_ppt
 
 
 print(st.__version__)
 # Define a function to execute generate_net() in a separate thread
 def generate_net_thread(prompt, user_input, openai_api_key):
     return generate_net(prompt=prompt, user=user_input, key=openai_api_key)
+
+# Define a function to execute generate_pptx() in a separate thread
+def generate_pptx_thread(prompt, user_input, openai_api_key, filename):
+    return generate_pptx(prompt=prompt, user=user_input, key=openai_api_key, filename=filename)
 
 
 print(prompt)
@@ -43,7 +48,7 @@ with st.container():
     openai_api_key = st.sidebar.text_input("Enter your OpenAI API key here")
     
     # Create a container for the input and button
-    input_col, button_col = st.columns([4, 1])
+    input_col, button_col, button_col_2 = st.columns([4, 1, 1])
     with input_col:
         hide_input_label_css = """
             <style>
@@ -54,7 +59,14 @@ with st.container():
     with button_col:
             st.write("") # Add some empty space
             st.write("") # Add some empty space
-            generate_button = st.sidebar.button("Generate")
+            generate_button = st.sidebar.button("Graph")
+
+    with button_col_2:
+            st.write("")
+            st.write("")
+            generate_pptx_button = st.sidebar.button("Presentation")
+
+    
 
     # Call generate_net() function when Generate button is clicked
     if generate_button:
@@ -104,6 +116,48 @@ with st.container():
             text_output = st.sidebar.empty()
             text_output.markdown("## Description for " + user_input)
             text_output.markdown(text, unsafe_allow_html=True)
+    
+    if generate_pptx_button:
+        # Add data validation to the input fields.
+        # If the input fields are empty, show an error message
+        if not user_input:
+            st.error("Please enter your text")
+        if not openai_api_key:
+            st.error("Please enter your OpenAI API key")
+        if not user_input or not openai_api_key:
+            st.stop()
+
+        pptx_bar_texts = ["Creating PowerPoint...", "Saving PowerPoint file..."]
+        logging.info("Generating PowerPoint")
+        pptx_progress_bar = st.progress(0, text="Generating PowerPoint...")
+        pptx_start_time = time.time()
+        pptx_time_limit = 30  # Set the time limit in seconds
+        pptx_name = "MTM_Presentation"
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            pptx_future = executor.submit(generate_pptx_thread, prompt_ppt, user_input, openai_api_key, pptx_name)
+            while time.time() - pptx_start_time < pptx_time_limit and not pptx_future.done():
+                # Update the progress bar every second
+                pptx_progress = (time.time() - pptx_start_time) / pptx_time_limit
+                # Update the progress bar after every percentage of the time elapses
+                if pptx_progress > 0.25 and pptx_progress < 0.75:
+                    pptx_progress_bar.progress(int(pptx_progress * 100), text=pptx_bar_texts[0])
+                elif pptx_progress > 0.75 and pptx_progress < 0.95:
+                    pptx_progress_bar.progress(int(pptx_progress * 100), text=pptx_bar_texts[1])
+                # reduce the sleep time if time elapsed is more than 90% of the time limit
+                if time.time() - pptx_start_time > pptx_time_limit * 0.9:
+                    time.sleep(0.1)
+                else:
+                    time.sleep(1)
+            pptx_progress_bar.empty()
+            logging.info("PowerPoint generated")
+            st.sidebar.markdown(f"## Download {pptx_name}")
+            st.sidebar.write("")
+            st.sidebar.write("")
+            pptx_download_button = st.sidebar.button("Download")
+            if pptx_download_button:
+                with open(pptx_name, "rb") as f:
+                    bytes = f.read()
+                    st.download_button(f"Download {pptx_name}", bytes, file_name=pptx_name, mime="application/vnd.openxmlformats-officedocument.presentationml.presentation")
 
     # Hide the Streamlit menu and footer to maximize white space
     # hide_menu_footer_css = """
