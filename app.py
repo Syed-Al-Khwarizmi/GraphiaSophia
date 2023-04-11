@@ -32,7 +32,7 @@ with st.container():
     st.markdown("""
         <style>
         .stApp {
-            margin-top: -80px;
+            margin-top: -90px;
         }
         .stApp > div:first-child {
             margin-top: 0 !important;
@@ -59,14 +59,7 @@ with st.container():
     with button_col:
             st.write("") # Add some empty space
             st.write("") # Add some empty space
-            generate_button = st.sidebar.button("Graph")
-
-    with button_col_2:
-            st.write("")
-            st.write("")
-            generate_pptx_button = st.sidebar.button("Presentation")
-
-    
+            generate_button = st.sidebar.button("Generate")
 
     # Call generate_net() function when Generate button is clicked
     if generate_button:
