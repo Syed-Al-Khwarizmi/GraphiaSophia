@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.INFO, filename="app.log")
 
 prompt = """
     For every scenario I provide, I need a json format response. The response should be a network graph with nodes and edges.
-    Nodes have the fields: Name, Text, Color, Shape.
+    Nodes have the fields: Name, Text, Color.
     Edges have the fields: Source, Destination, Label
 
     A Node contains: 
@@ -38,7 +38,7 @@ prompt = """
         "Response": {
             "Nodes": [{field: value}],
             "Edges": [[field: value]],
-            "Text": "Explanation converted into markdown bullet list format"
+            "Text": "Explanation converted into markdown bullet list format. All endline characters should be removed."
         }
     }
     Only return json objects and text. Every node must be connected to a node through an edge.
@@ -55,10 +55,10 @@ def get_jsons(prompt, user, key):
                 {"role": "user", "content": user},
           ],
         max_tokens=3500,
-        temperature=1
+        temperature=0
         )
     except Exception as e:
-        print(str(e))
+        logging.error(str(e))
         print("API error")
         pass
     
@@ -146,7 +146,7 @@ def generate_net(prompt, user, key):
                 shape = n[1]['Shape'],
                 title = n[1]['Text'],
                 physics = False,
-                borderWidth = 2,
+                borderWidth = 3,
             )
 
         for e in edges.iterrows():

@@ -43,23 +43,24 @@ with st.container():
     st.title("Mind The Map")
     
     # Create input fields for user input and OpenAI API key
-    # st.sidebar.title("Input")
-    user_input = st.sidebar.text_area("Enter your text here", max_chars=250)
+    user_input = st.text_area("Enter your text here", max_chars=350)
     openai_api_key = st.sidebar.text_input("Enter your OpenAI API key here")
+
+    # Create a container for the input and buttons
+    # input_col, 
+    gen_button, gen_ppt_button = st.sidebar.columns([1, 4.3])
+    # with input_col:
+    #     hide_input_label_css = """
+    #         <style>
+    #         div[data-testid="stText"][role="textbox"] > label {visibility: hidden;}
+    #         </style>
+    #         """
+    #     st.markdown(hide_input_label_css, unsafe_allow_html=True)
+    with gen_button:
+        generate_button = st.button("Generate", key="generate_button")
     
-    # Create a container for the input and button
-    input_col, button_col, button_col_2 = st.columns([4, 1, 1])
-    with input_col:
-        hide_input_label_css = """
-            <style>
-            div[data-testid="stText"][role="textbox"] > label {visibility: hidden;}
-            </style>
-            """
-        st.markdown(hide_input_label_css, unsafe_allow_html=True)
-    with button_col:
-            st.write("") # Add some empty space
-            st.write("") # Add some empty space
-            generate_button = st.sidebar.button("Generate")
+    with gen_ppt_button:
+        generate_pptx_button = st.button("Generate PPT", key="generate_pptx_button")
 
     # Call generate_net() function when Generate button is clicked
     if generate_button:
@@ -143,9 +144,9 @@ with st.container():
                     time.sleep(1)
             pptx_progress_bar.empty()
             logging.info("PowerPoint generated")
-            st.sidebar.markdown(f"## Download {pptx_name}")
-            st.sidebar.write("")
-            st.sidebar.write("")
+            st.sidebar.markdown(f"## Download Presentation")
+            # st.sidebar.write("")
+            # st.sidebar.write("")
             pptx_download_button = st.sidebar.button("Download")
             if pptx_download_button:
                 with open(pptx_name, "rb") as f:

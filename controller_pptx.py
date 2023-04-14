@@ -1,3 +1,7 @@
+import openai
+from pptx import Presentation
+import json
+
 prompt_ppt = """
 For every scenario I provide, I need at detailed response in a json format. Be critical and provide accurate facts and figures.
 
@@ -30,7 +34,8 @@ Generate slides with a mix of both text and bullet points.
 """
 
 def get_response(prompt, user, key):
-    try:   
+    try: 
+        print("Called response from pptx")
         openai.api_key = key
         resp = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
@@ -41,6 +46,8 @@ def get_response(prompt, user, key):
         max_tokens=3500,
         temperature=0
         )
+        print("Showing response from pptx")
+        print(resp)
     except Exception as e:
         logging.error(str(e))
         print("API error")
@@ -91,6 +98,7 @@ def create_pptx_from_json(json_text, filename):
 def generate_pptx(prompt, user, key, filename):
     
     user = "Scenario: "+user
+    print(user)
     # Get the response from the GPT-3 model
     print("Generating PowerPoint presentation...")
     resp = get_response(prompt_ppt, user, key)
