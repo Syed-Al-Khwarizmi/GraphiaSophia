@@ -1,7 +1,9 @@
 import logging
 logging.info("Importing libraries")
 import re
+import io
 import time
+import base64
 import concurrent.futures
 import streamlit as st
 import streamlit.components.v1 as components
@@ -44,7 +46,7 @@ with st.container():
     
     # Create input fields for user input and OpenAI API key
     user_input = st.text_area("Enter your text here", max_chars=350)
-    openai_api_key = st.sidebar.text_input("Enter your OpenAI API key here")
+    openai_api_key = st.sidebar.text_input("Enter your OpenAI API key here", type="password")
 
     # Create a container for the input and buttons
     # input_col, 
@@ -112,8 +114,8 @@ with st.container():
             text_output.markdown(text, unsafe_allow_html=True)
     
     if generate_pptx_button:
-        # Add data validation to the input fields.
-        # If the input fields are empty, show an error message
+    # Add data validation to the input fields.
+    # If the input fields are empty, show an error message
         if not user_input:
             st.error("Please enter your text")
         if not openai_api_key:
@@ -144,14 +146,22 @@ with st.container():
                     time.sleep(1)
             pptx_progress_bar.empty()
             logging.info("PowerPoint generated")
-            st.sidebar.markdown(f"## Download Presentation")
-            # st.sidebar.write("")
-            # st.sidebar.write("")
-            pptx_download_button = st.sidebar.button("Download")
-            if pptx_download_button:
-                with open(pptx_name, "rb") as f:
-                    bytes = f.read()
-                    st.download_button(f"Download {pptx_name}", bytes, file_name=pptx_name, mime="application/vnd.openxmlformats-officedocument.presentationml.presentation")
+            # Save the presentation to a BytesIO buffer
+            pptx_buffer = io.BytesIO()
+            with open(f"{pptx_name}.pptx", "rb") as f:
+                pptx_buffer.write(f.read())
+
+            # Encode the PowerPoint file as base64
+            pptx_b64 = base64.b64encode(pptx_buffer.getvalue()).decode()
+
+            # Create a data URL for the base64-encoded file
+            href = f"data:application/vnd.openxmlformats-officedocument.presentationml.presentation;base64,{pptx_b64}"
+            
+            # Use an HTML anchor tag to create a link that triggers the download when clicked
+            components.html(f'<a href="{href}" download="{pptx_name}.pptx">Download Presentation</a>')
+            # Convert the buffer to bytes and present it as a download link
+            # pptx_bytes = pptx_buffer.getvalue()
+            # st.download_button(f"Download {pptx_name}", pptx_bytes, file_name=pptx_name, mime="application/vnd.openxmlformats-officedocument.presentationml.presentation")
 
     # Hide the Streamlit menu and footer to maximize white space
     # hide_menu_footer_css = """
