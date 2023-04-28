@@ -11,38 +11,70 @@ logging.basicConfig(level=logging.INFO, filename="app.log")
 # with open('secrets.env') as f:
 #     openai.api_key = f.readline()
 
+# prompt = """
+#     For every scenario I provide, I need a json format response. The response should be a network graph with nodes and edges.
+#     Nodes have the fields: Name, Text, Color.
+#     Edges have the fields: Source, Destination, Label
+
+#     A Node contains: 
+#     Name: The actual name of the entity.
+#     Text: A small description of the entity.
+#     Color: A web friendly dark color in hex format.
+    
+#     An Edge contains:
+#     Source: Name of the source Node.
+#     Destination: Name of the destination Node
+#     Label: Shows a text relation between the two nodes.
+
+#     Text: A markdown bullet format conversion of the explanation in the following format:
+#     ### Heading
+#     - **Subheading**: List of detailed explanaied bullet points
+    
+#     Both Source and Destinations MUST be in the Nodes list.
+#     I need at least 10 nodes.
+    
+#     The message content should follow the format:
+#     {
+#         "Response": {
+#             "Nodes": [{field: value}],
+#             "Edges": [[field: value]],
+#             "Text": "Explanation converted into markdown bullet list format. All endline characters should be removed."
+#         }
+#     }
+#     Only return json objects and text. Every node must be connected to a node through an edge.
+    
+# """
+
+
 prompt = """
-    For every scenario I provide, I need a json format response. The response should be a network graph with nodes and edges.
-    Nodes have the fields: Name, Text, Color.
-    Edges have the fields: Source, Destination, Label
+Please provide a JSON response for each scenario, containing a network graph with nodes and edges. The response should include at least 10 nodes.
 
-    A Node contains: 
-    Name: The actual name of the entity.
-    Text: A small description of the entity.
-    Color: A web friendly dark color in hex format.
-    
-    An Edge contains:
-    Source: Name of the source Node.
-    Destination: Name of the destination Node
-    Label: Shows a text relation between the two nodes.
+Each node should have the following fields:
+- Name: The name of the entity.
+- Text: A brief description of the entity.
+- Color: A dark color in hex format.
 
-    Text: A markdown bullet format conversion of the explanation in the following format:
-    ### Heading
-    - **Subheading**: List of detailed explanaied bullet points
-    
-    Both Source and Destinations MUST be in the Nodes list.
-    I need at least 10 nodes.
-    
-    The message content should follow the format:
-    {
-        "Response": {
-            "Nodes": [{field: value}],
-            "Edges": [[field: value]],
-            "Text": "Explanation converted into markdown bullet list format. All endline characters should be removed."
-        }
+Each edge should have the following fields:
+- Source: The name of the source node.
+- Destination: The name of the destination node.
+- Label: A text label that describes the relationship between the two nodes.
+
+Text: A markdown bullet format conversion of the explanation in the following format:
+### Heading
+- **Subheading**: List of detailed explanaied bullet points
+
+Nodes and edges should be connected to form a network graph. Both the source and destination of each edge must be present in the node list.
+
+The json should be formatted as follows:
+{
+    "Response": {
+        "Nodes": [{field: value}],
+        "Edges": [[field: value]],
+        "Text": "The explanation, converted to a markdown bullet list format. All newline characters should be removed."
     }
-    Only return json objects and text. Every node must be connected to a node through an edge.
-    
+}
+
+Only return JSON object.
 """
 
 def get_jsons(prompt, user, key):
@@ -64,6 +96,32 @@ def get_jsons(prompt, user, key):
     
     # turbo ChatCompletion resp
     return resp.to_dict()["choices"][0]["message"]["content"].replace("\n", "").strip()
+
+
+
+#Dataframe to net
+def df_to_net(df_nodes, df_edges):
+    net = Network("600px", "100%", directed=True, notebook=False)
+    for n in df_nodes.iterrows():
+        net.add_node(
+            n_id = n[1]['Name'], 
+            label = n[1]['Name'], 
+            color = n[1]['Color'],
+            shape = n[1]['Shape'],
+            title = n[1]['Text'],
+            physics = False,
+        )
+
+    for e in df_edges.iterrows():
+        net.add_edge(
+            arrowStrikethrough = False,
+            source = e[1]['Source'],
+            to = e[1]['Destination'],
+            title = e[1]['Label'],
+            physics = True
+        )
+
+    return net
 
 
 def generate_net(prompt, user, key):
@@ -88,26 +146,27 @@ def generate_net(prompt, user, key):
         }
     )
 
-    # Saving default net
-    net = Network("600px", "100%", directed=True, notebook=False)
-    for n in nodes.iterrows():
-        net.add_node(
-            n_id = n[1]['Name'], 
-            label = n[1]['Name'], 
-            color = n[1]['Color'],
-            shape = n[1]['Shape'],
-            title = n[1]['Text'],
-            physics = False,
-        )
+    net = df_to_net(nodes, edges)
+    # # Saving default net
+    # net = Network("600px", "100%", directed=True, notebook=False)
+    # for n in nodes.iterrows():
+    #     net.add_node(
+    #         n_id = n[1]['Name'], 
+    #         label = n[1]['Name'], 
+    #         color = n[1]['Color'],
+    #         shape = n[1]['Shape'],
+    #         title = n[1]['Text'],
+    #         physics = False,
+    #     )
 
-    for e in edges.iterrows():
-        net.add_edge(
-            arrowStrikethrough = False,
-            source = e[1]['Source'],
-            to = e[1]['Destination'],
-            title = e[1]['Label'],
-            physics = True
-        )
+    # for e in edges.iterrows():
+    #     net.add_edge(
+    #         arrowStrikethrough = False,
+    #         source = e[1]['Source'],
+    #         to = e[1]['Destination'],
+    #         title = e[1]['Label'],
+    #         physics = True
+    #     )
 
     net.save_graph("experiment.html")
 
@@ -135,29 +194,30 @@ def generate_net(prompt, user, key):
     logging.info(edges)
 
     try:
-        net = Network("600px", "100%", directed=True, notebook=False)
-        net.repulsion(node_distance=120, central_gravity=0.011, spring_length=120, damping=0.2)
-        # net.show_buttons(filter_=['physics'])
-        for n in nodes.iterrows():
-            net.add_node(
-                n_id = n[1]['Name'], 
-                label = n[1]['Name'], 
-                color = n[1]['Color'],
-                shape = n[1]['Shape'],
-                title = n[1]['Text'],
-                physics = False,
-                borderWidth = 3,
-            )
+        net = df_to_net(nodes, edges)
+        # net = Network("600px", "100%", directed=True, notebook=False)
+        # net.repulsion(node_distance=120, central_gravity=0.011, spring_length=120, damping=0.2)
+        # # net.show_buttons(filter_=['physics'])
+        # for n in nodes.iterrows():
+        #     net.add_node(
+        #         n_id = n[1]['Name'], 
+        #         label = n[1]['Name'], 
+        #         color = n[1]['Color'],
+        #         shape = n[1]['Shape'],
+        #         title = n[1]['Text'],
+        #         physics = False,
+        #         borderWidth = 3,
+        #     )
 
-        for e in edges.iterrows():
-            net.add_edge(
-                arrowStrikethrough = False,
-                source = e[1]['Source'],
-                to = e[1]['Destination'],
-                title = e[1]['Label'],
-        #         value = e[1]['Weight'],
-                physics = True
-            )
+        # for e in edges.iterrows():
+        #     net.add_edge(
+        #         arrowStrikethrough = False,
+        #         source = e[1]['Source'],
+        #         to = e[1]['Destination'],
+        #         title = e[1]['Label'],
+        # #         value = e[1]['Weight'],
+        #         physics = True
+        #     )
     except Exception as e:
         logging.error(str(e))
         print("Graph error")
