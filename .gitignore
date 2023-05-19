@@ -1,3 +1,4 @@
 ngrok.exe
 secrets.env
 MTM_Presentation.pptx
+cache/*
