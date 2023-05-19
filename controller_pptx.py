@@ -34,6 +34,7 @@ Here's a sample json body I want:
     }
   ]
 }
+Nothing outside of this format should be returned.
 
 There should be only one slide title, one subheading, and multiple slides. The first slide should always be the Agenda slide.
 The second slide should contain a brief history of the topic and an introduction. The last slide should be the conclusion slide.
