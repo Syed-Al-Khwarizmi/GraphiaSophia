@@ -51,6 +51,9 @@ class GraphiaSophia:
 
 
     def run(self):
+        # Create a cache directory if it doesn't exist
+        if not os.path.exists(self.cache_dir):
+            os.makedirs(self.cache_dir)
         # Start the background thread to clear the cache directory
         clear_cache_thread = threading.Thread(target=self.clear_cache_directory)
         clear_cache_thread.start()
