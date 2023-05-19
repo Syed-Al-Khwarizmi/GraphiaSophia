@@ -36,7 +36,7 @@ class GraphiaSophia:
     
     def clear_cache_directory(self):
         # Sleep for 5 minutes
-        time.sleep(300)
+        time.sleep(900)
         while True:
             # Clear the cache directory
             for filename in os.listdir(self.cache_dir):
