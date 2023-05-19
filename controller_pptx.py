@@ -1,9 +1,13 @@
 import openai
 from pptx import Presentation
 import json
+import os
+import hashlib
 
 import logging
 logging.basicConfig(level=logging.INFO, filename="app.log")
+
+cache_dir = "cache"
 
 prompt_ppt = """
 For every scenario I provide, I need at detailed response in a json format. Be critical and provide accurate facts and figures.
@@ -60,7 +64,7 @@ def get_response(prompt, user, key):
     return resp.to_dict()["choices"][0]["message"]["content"].replace("\n", "").strip()
 
 
-def create_pptx_from_json(json_text, filename):
+def create_pptx_from_json(json_text, user, filename):
     # Load the JSON
     data = json.loads(json_text)
 
@@ -94,13 +98,18 @@ def create_pptx_from_json(json_text, filename):
                     p.text = point
                     p.level = 1
 
+    # Generate a unique filename based on user information
+    user_hash = hashlib.md5(user.encode()).hexdigest()
+    print("Saving with user: " + user)
+    print("Saving with hash: " + user_hash)
+    filename = f"presentation_{user_hash}.pptx"
+    cache_file = os.path.join(cache_dir, filename)
     # Save the PowerPoint presentation
-    prs.save(filename+".pptx")
+    prs.save(cache_file)
 
 
 def generate_pptx(prompt, user, key, filename):
     
-    user = "Scenario: "+user
     print(user)
     # Get the response from the GPT-3 model
     print("Generating PowerPoint presentation...")
@@ -110,5 +119,5 @@ def generate_pptx(prompt, user, key, filename):
     
     # Create the PowerPoint presentation
     print("Creating PowerPoint presentation...LOL")
-    create_pptx_from_json(resp, filename)
+    create_pptx_from_json(resp, user, filename)
     print("PowerPoint presentation saved as "+filename+".pptx")

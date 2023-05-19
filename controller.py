@@ -2,6 +2,8 @@ import openai
 import json
 import pandas as pd
 import logging
+import os
+import hashlib
 import re
 from pyvis.network import Network
 
@@ -45,6 +47,8 @@ logging.basicConfig(level=logging.INFO, filename="app.log")
     
 # """
 
+# Define the cache directory
+cache_dir = "cache"
 
 def get_prompt(n_nodes = 10):
     json_format = """{
@@ -146,7 +150,6 @@ def df_to_net(df_nodes, df_edges):
 
 def generate_net(prompt, user, key):
     node_shape = "dot"
-    user = "Scenario: "+user
     # Default text, nodes and edges:
     text = "Uh oh! Something went wrong! Please try again or modify the input a bit."
     nodes = pd.DataFrame(
@@ -188,7 +191,14 @@ def generate_net(prompt, user, key):
     #         physics = True
     #     )
 
-    net.save_graph("experiment.html")
+    # net.save_graph("experiment.html")
+    # Generate a unique filename based on user information
+    user_hash = hashlib.md5(user.encode()).hexdigest()
+    print("Saving with user: " + user)
+    print("Saving with hash: " + user_hash)
+    filename = f"experiment_{user_hash}.html"
+    cache_file = os.path.join(cache_dir, filename)
+    net.save_graph(cache_file)
 
     logging.info("User input: " + user)
     try:
@@ -215,36 +225,20 @@ def generate_net(prompt, user, key):
 
     try:
         net = df_to_net(nodes, edges)
-        # net = Network("600px", "100%", directed=True, notebook=False)
-        # net.repulsion(node_distance=120, central_gravity=0.011, spring_length=120, damping=0.2)
-        # # net.show_buttons(filter_=['physics'])
-        # for n in nodes.iterrows():
-        #     net.add_node(
-        #         n_id = n[1]['Name'], 
-        #         label = n[1]['Name'], 
-        #         color = n[1]['Color'],
-        #         shape = n[1]['Shape'],
-        #         title = n[1]['Text'],
-        #         physics = False,
-        #         borderWidth = 3,
-        #     )
-
-        # for e in edges.iterrows():
-        #     net.add_edge(
-        #         arrowStrikethrough = False,
-        #         source = e[1]['Source'],
-        #         to = e[1]['Destination'],
-        #         title = e[1]['Label'],
-        # #         value = e[1]['Weight'],
-        #         physics = True
-        #     )
     except Exception as e:
         logging.error(str(e))
         print("Graph error")
         pass
 
     # net.show_buttons(filter_=['physics'])
-    net.save_graph("experiment.html")
+    # net.save_graph("experiment.html")
+
+    user_hash = hashlib.md5(user.encode()).hexdigest()
+    print("Saving with user: " + user)
+    print("Saving with hash: " + user_hash)
+    filename = f"experiment_{user_hash}.html"
+    cache_file = os.path.join(cache_dir, filename)
+    net.save_graph(cache_file)
     # Disable node physics
     # Originally, node physics are enabled so that nodes are rendered in a structured format.
     # Later, node physics are disabled so that nodes can be dragged around.

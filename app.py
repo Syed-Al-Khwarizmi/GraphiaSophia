@@ -1,18 +1,22 @@
 import logging
 import re
 import io
+import os
+import hashlib
 import time
 import base64
+import shutil
+import threading
 import concurrent.futures
 import streamlit as st
 import streamlit.components.v1 as components
+import extra_streamlit_components as stx
 
 from controller import generate_net, get_prompt
 from controller_pptx import generate_pptx, prompt_ppt
 
 
-
-class MindTheMap:
+class GraphiaSophia:
     def __init__(self):
         self.logging = logging
         self.re = re
@@ -25,13 +29,32 @@ class MindTheMap:
         self.controller = generate_net
         self.controller_pptx = generate_pptx
         self.text = ""
-
+        # Create a cache directory, don't use the absolute path
+        self.cache_dir = os.path.join(".", "cache")
 
     def display_text(self, text):
         st.sidebar.markdown(self.text, unsafe_allow_html=True)
+    
+    def clear_cache_directory(self):
+        # Sleep for 5 minutes
+        time.sleep(300)
+        while True:
+            # Clear the cache directory
+            for filename in os.listdir(self.cache_dir):
+                file_path = os.path.join(self.cache_dir, filename)
+                try:
+                    if os.path.isfile(file_path):
+                        os.remove(file_path)
+                    elif os.path.isdir(file_path):
+                        shutil.rmtree(file_path)
+                except Exception as e:
+                    print(f"Failed to delete {file_path}: {str(e)}")
 
 
     def run(self):
+        # Start the background thread to clear the cache directory
+        clear_cache_thread = threading.Thread(target=self.clear_cache_directory)
+        clear_cache_thread.start()
         # Set the page configuration
         st.set_page_config(layout="wide")
         with st.container():
@@ -103,7 +126,7 @@ class MindTheMap:
                 st.error("Please enter your OpenAI API key")
 
             # Concatenate complxiety level with user input
-            user_input = f"{user_input}. Explain to me as if I'm a {complexity_level}."
+            user_input = f"Scenario: {user_input}. Explain to me as if I'm a {complexity_level}."
             # Call generate_net() function.
             self.text, nodes= self.controller(prompt=get_prompt(n_nodes=node_count), user=user_input, key=openai_api_key)
 
@@ -128,12 +151,20 @@ class MindTheMap:
                 st.error("Please enter your text")
             if not openai_api_key:
                 st.error("Please enter your OpenAI API key")
-
+            
+            # Concatenate complxiety level with user input
+            user_input = f"Scenario: {user_input}. Explain to me as if I'm a {complexity_level}."
             # Call generate_pptx() function.
             self.display_text(self.text)
             self.controller_pptx(prompt=prompt_ppt, user=user_input, key=openai_api_key, filename=filename)
             # Convert pptx file to base64
-            with open(f"{filename}.pptx", "rb") as file:
+            # Generate a unique filename based on user information
+            user_hash = hashlib.md5(user_input.encode()).hexdigest()
+            print("Saving with user: " + user_input)
+            print("Saving with hash: " + user_hash)
+            filename = f"presentation_{user_hash}.pptx"
+            cache_file = os.path.join(self.cache_dir, filename)
+            with open(f"{cache_file}", "rb") as file:
                 file_b64 = base64.b64encode(file.read()).decode()
 
 
@@ -146,15 +177,24 @@ class MindTheMap:
             st.markdown(f'{pptx_file_link}', unsafe_allow_html=True)
 
         # Open the experiment.html file in the HtmlFile variable and add it to the components.html
-        with open("experiment.html", "r") as HtmlFile:
+        user_hash = hashlib.md5(user_input.encode()).hexdigest()
+        filename = f"experiment_{user_hash}.html"
+        cache_file = os.path.join(self.cache_dir, filename)
+        print("Opening with user: " + user_input)
+        print("cache_file: " + cache_file)
+        # If not exists the cache_file, then cache_file = "experiment.html"
+        if not os.path.exists(cache_file):
+            cache_file = "./experiment.html"
+        # Get the user's cookie value from the Streamlit request context
+        with open(cache_file, "r") as HtmlFile:
             source_code = HtmlFile.read()
-            html_url = "./experiment.html"
             components.html(source_code, scrolling=False, height=650)
+
 
 
 if __name__ == "__main__":
     # Create an instance of the MindTheMap class.
-    mind_the_map = MindTheMap()
+    graphia_sophia = GraphiaSophia()
 
     # Run the web application.
-    mind_the_map.run()
+    graphia_sophia.run()
