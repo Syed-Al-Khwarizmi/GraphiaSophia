@@ -14,6 +14,7 @@ import streamlit.components.v1 as components
 from controller import generate_net, get_prompt
 from controller_pptx import generate_pptx, prompt_ppt
 
+logging.basicConfig(level=logging.INFO, filename="app.log")
 
 class GraphiaSophia:
     def __init__(self):

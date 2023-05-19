@@ -42,7 +42,7 @@ Generate slides with a mix of both text and bullet points.
 
 def get_response(prompt, user, key):
     try: 
-        print("Called response from pptx")
+        logging.info("Called response from pptx")
         openai.api_key = key
         resp = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
@@ -53,18 +53,18 @@ def get_response(prompt, user, key):
         max_tokens=3500,
         temperature=0
         )
-        print("Showing response from pptx")
-        print(resp)
+        logging.info("Showing response from pptx")
+        logging.info(resp)
     except Exception as e:
         logging.error(str(e))
-        print("API error")
+        logging.info("API error")
         pass
     
     # turbo ChatCompletion resp
     return resp.to_dict()["choices"][0]["message"]["content"].replace("\n", "").strip()
 
 
-def create_pptx_from_json(json_text, user, filename):
+def create_pptx_from_json(json_text, user):
     # Load the JSON
     data = json.loads(json_text)
 
@@ -100,8 +100,8 @@ def create_pptx_from_json(json_text, user, filename):
 
     # Generate a unique filename based on user information
     user_hash = hashlib.md5(user.encode()).hexdigest()
-    print("Saving with user: " + user)
-    print("Saving with hash: " + user_hash)
+    logging.info("Saving with user: " + user)
+    logging.info("Saving with hash: " + user_hash)
     filename = f"presentation_{user_hash}.pptx"
     cache_file = os.path.join(cache_dir, filename)
     # Save the PowerPoint presentation
@@ -110,14 +110,14 @@ def create_pptx_from_json(json_text, user, filename):
 
 def generate_pptx(prompt, user, key, filename):
     
-    print(user)
+    logging.info(user)
     # Get the response from the GPT-3 model
-    print("Generating PowerPoint presentation...")
+    logging.info("Generating PowerPoint presentation...")
     resp = get_response(prompt_ppt, user, key)
-    print("Done!")
-    print(resp)
+    logging.info("Done!")
+    logging.info(resp)
     
     # Create the PowerPoint presentation
-    print("Creating PowerPoint presentation...LOL")
+    logging.info("Creating PowerPoint presentation...LOL")
     create_pptx_from_json(resp, user, filename)
-    print("PowerPoint presentation saved as "+filename+".pptx")
+    # logging.info("PowerPoint presentation saved as "+filename+".pptx")
