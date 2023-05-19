@@ -56,7 +56,7 @@ def get_prompt(n_nodes = 10):
             }
             """
     prompt = """
-            Please provide a JSON response for each scenario, containing a network graph with nodes and edges. The response should include at least {} nodes.
+            Please provide a JSON response for each scenario, containing a network graph with nodes and edges. The response should include exactly {} nodes.
 
             Each node should have the following fields:
             - Name: The name of the entity
