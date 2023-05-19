@@ -119,5 +119,5 @@ def generate_pptx(prompt, user, key, filename):
     
     # Create the PowerPoint presentation
     logging.info("Creating PowerPoint presentation...LOL")
-    create_pptx_from_json(resp, user, filename)
+    create_pptx_from_json(resp, user)
     # logging.info("PowerPoint presentation saved as "+filename+".pptx")
