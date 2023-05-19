@@ -38,7 +38,7 @@ Nothing outside of this format should be returned.
 
 There should be only one slide title, one subheading, and multiple slides. The first slide should always be the Agenda slide.
 The second slide should contain a brief history of the topic and an introduction. The last slide should be the conclusion slide.
-Generate slides with a mix of both text and bullet points. Only return the JSON object without any additional text.
+Generate slides with a mix of both text and bullet points. Only return the JSON object. Truncate anything after the outermost closing parentheses.
 """
 
 def get_response(prompt, user, key):
