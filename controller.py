@@ -47,35 +47,36 @@ logging.basicConfig(level=logging.INFO, filename="app.log")
 
 
 def get_prompt(n_nodes = 10):
-    prompt = """
-                Please provide a JSON response for each scenario, containing a network graph with nodes and edges. The response should include at least {n_nodes} nodes.
-
-                Each node should have the following fields:
-                - Name: The name of the entity
-                - Color: A random dark, web friendly color in hex format
-
-                Each edge should have the following fields:
-                - Source: The name of the source node.
-                - Destination: The name of the destination node.
-                - Label: A text label that describes the relationship between the two nodes.
-
-                Text: A markdown bullet format conversion of the explanation of all nodes in the following format:
-                ### Heading
-                - **Subheading**: List of detailed explanaied bullet points
-
-                Nodes and edges should be connected to form a network graph. The generated graph should have max number of edges between the nodes.
-
-                The json should be formatted as follows:
-                {
-                    "Response": {
-                        "Nodes": [{field: value}],
-                        "Edges": [[field: value]],
-                        "Text": "The explanation, converted to a markdown bullet list format. All newline characters should be removed."
-                    }
+    json_format = """{
+                "Response": {
+                    "Nodes": [{field: value}],
+                    "Edges": [[field: value]],
+                    "Text": "The explanation, converted to a markdown bullet list format. All newline characters should be removed."
                 }
-
-                Only return JSON object.
+            }
             """
+    prompt = """
+            Please provide a JSON response for each scenario, containing a network graph with nodes and edges. The response should include at least {} nodes.
+
+            Each node should have the following fields:
+            - Name: The name of the entity
+            - Color: A random dark, web-friendly color in hex format
+
+            Each edge should have the following fields:
+            - Source: The name of the source node.
+            - Destination: The name of the destination node.
+            - Label: A text label that describes the relationship between the two nodes.
+
+            Text: A markdown bullet format conversion of the explanation of all nodes in the following format:
+            ### Heading
+            - **Subheading**: List of detailed explained bullet points
+
+            Nodes and edges should be connected to form a network graph. The generated graph should have the maximum number of edges between the nodes.
+
+            The JSON should be formatted as follows:
+            {}
+            Only return JSON object.
+        """.format(n_nodes, json_format)
     return prompt
 
 def get_jsons(prompt, user, key):
