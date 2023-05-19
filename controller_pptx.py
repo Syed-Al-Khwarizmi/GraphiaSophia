@@ -2,6 +2,9 @@ import openai
 from pptx import Presentation
 import json
 
+import logging
+logging.basicConfig(level=logging.INFO, filename="app.log")
+
 prompt_ppt = """
 For every scenario I provide, I need at detailed response in a json format. Be critical and provide accurate facts and figures.
 

@@ -46,36 +46,37 @@ logging.basicConfig(level=logging.INFO, filename="app.log")
 # """
 
 
-prompt = """
-Please provide a JSON response for each scenario, containing a network graph with nodes and edges. The response should include at least 10 nodes.
+def get_prompt(n_nodes = 10):
+    prompt = """
+                Please provide a JSON response for each scenario, containing a network graph with nodes and edges. The response should include at least {n_nodes} nodes.
 
-Each node should have the following fields:
-- Name: The name of the entity.
-- Text: A brief description of the entity.
-- Color: A dark color in hex format.
+                Each node should have the following fields:
+                - Name: The name of the entity
+                - Color: A random dark, web friendly color in hex format
 
-Each edge should have the following fields:
-- Source: The name of the source node.
-- Destination: The name of the destination node.
-- Label: A text label that describes the relationship between the two nodes.
+                Each edge should have the following fields:
+                - Source: The name of the source node.
+                - Destination: The name of the destination node.
+                - Label: A text label that describes the relationship between the two nodes.
 
-Text: A markdown bullet format conversion of the explanation in the following format:
-### Heading
-- **Subheading**: List of detailed explanaied bullet points
+                Text: A markdown bullet format conversion of the explanation of all nodes in the following format:
+                ### Heading
+                - **Subheading**: List of detailed explanaied bullet points
 
-Nodes and edges should be connected to form a network graph. Both the source and destination of each edge must be present in the node list.
+                Nodes and edges should be connected to form a network graph. The generated graph should have max number of edges between the nodes.
 
-The json should be formatted as follows:
-{
-    "Response": {
-        "Nodes": [{field: value}],
-        "Edges": [[field: value]],
-        "Text": "The explanation, converted to a markdown bullet list format. All newline characters should be removed."
-    }
-}
+                The json should be formatted as follows:
+                {
+                    "Response": {
+                        "Nodes": [{field: value}],
+                        "Edges": [[field: value]],
+                        "Text": "The explanation, converted to a markdown bullet list format. All newline characters should be removed."
+                    }
+                }
 
-Only return JSON object.
-"""
+                Only return JSON object.
+            """
+    return prompt
 
 def get_jsons(prompt, user, key):
     try:   
@@ -83,7 +84,7 @@ def get_jsons(prompt, user, key):
         resp = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=[
-                {"role": "system", "content": prompt},
+                {"role": "system", "content": get_prompt()},
                 {"role": "user", "content": user},
           ],
         max_tokens=3500,
@@ -102,13 +103,32 @@ def get_jsons(prompt, user, key):
 #Dataframe to net
 def df_to_net(df_nodes, df_edges):
     net = Network("600px", "100%", directed=True, notebook=False)
+    
+    # Check if source or destination text is missing in nodes DataFrame
+    missing_nodes = set(df_edges['Source'].unique()) | set(df_edges['Destination'].unique()) - set(df_nodes['Name'].unique())
+    print(missing_nodes)
+    # Create a DataFrame for the missing nodes
+    missing_nodes_df = pd.DataFrame({
+        'Name': list(missing_nodes),
+        # 'Text': list(missing_nodes),
+        'Color': df_nodes['Color'].sample(n=len(missing_nodes), replace=True).reset_index(drop=True),
+        'Shape': 'dot'
+    })
+    print("Missing Nodes")
+    print(missing_nodes_df)
+    # Concatenate existing nodes DataFrame with missing nodes DataFrame
+    df_nodes = pd.concat([df_nodes, missing_nodes_df], ignore_index=True)
+    print("New nodes df after adding missing nodes")
+    print(df_nodes)
+
+
     for n in df_nodes.iterrows():
         net.add_node(
             n_id = n[1]['Name'], 
             label = n[1]['Name'], 
             color = n[1]['Color'],
             shape = n[1]['Shape'],
-            title = n[1]['Text'],
+            # title = n[1]['Text'],
             physics = False,
         )
 
@@ -120,7 +140,6 @@ def df_to_net(df_nodes, df_edges):
             title = e[1]['Label'],
             physics = True
         )
-
     return net
 
 
@@ -134,7 +153,7 @@ def generate_net(prompt, user, key):
             "Name": ["Uh Oh!"],
             "Text": ["Something went wrong!"],
             "Color": ["#FCFCFC"],
-            "Shape": ["ellipse"],
+            "Shape": ["dot"],
         }
     )
 
@@ -222,7 +241,14 @@ def generate_net(prompt, user, key):
         logging.error(str(e))
         print("Graph error")
         pass
+
+    # net.show_buttons(filter_=['physics'])
     net.save_graph("experiment.html")
+    # Disable node physics
+    # Originally, node physics are enabled so that nodes are rendered in a structured format.
+    # Later, node physics are disabled so that nodes can be dragged around.
+    # net.toggle_physics(False)
+    # net.save_graph("experiment.html")
     return text, nodes
 
 if __name__ == "__main__":

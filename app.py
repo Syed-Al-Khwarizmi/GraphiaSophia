@@ -7,7 +7,7 @@ import concurrent.futures
 import streamlit as st
 import streamlit.components.v1 as components
 
-from controller import generate_net, prompt
+from controller import generate_net, get_prompt
 from controller_pptx import generate_pptx, prompt_ppt
 
 
@@ -32,6 +32,8 @@ class MindTheMap:
 
 
     def run(self):
+        # Set the page configuration
+        st.set_page_config(layout="wide")
         with st.container():
             # Add CSS styles to adjust margins and padding
             st.markdown("""
@@ -45,10 +47,41 @@ class MindTheMap:
                 }
                 </style>
             """, unsafe_allow_html=True)
-        st.title("Mind The Map")
+        st.title("GraphiaSophia")
+
+        # # Create a text input field where users can enter text.
+        # user_input = st.text_area("Enter your text here", max_chars=350)
+        # # Create a number selector for the node count
+        # node_count = st.number_input(
+        #     "Select the number of nodes (5-20)",
+        #     min_value=5,
+        #     max_value=20,
+        #     value=10,
+        #     step=1
+        # )
+
+        # Create a two-column layout
+        col1, col2 = st.columns([2, 1])
 
         # Create a text input field where users can enter text.
-        user_input = st.text_area("Enter your text here", max_chars=350)
+        user_input = col1.text_area("Enter your text here", max_chars=350, height=128)
+
+        # Create a number selector for the node count
+        with col2:
+            node_count = col2.number_input(
+            "Select the number of nodes (5-20)",
+            min_value=5,
+            max_value=20,
+            value=10,
+            step=1
+        )
+
+        # Create a dropdown for the education level
+        with col2:
+            complexity_level = col2.selectbox(
+            "Select your complexity level",
+            options=["1st Grader", "5th Grader", "Middle Schooler", "High Schooler", "Graduate Level", "Postgraduate Level"]
+        )
 
         # Create a text input field for the OpenAI API key.
         openai_api_key = st.sidebar.text_input("Enter your OpenAI API key here", type="password")
@@ -69,8 +102,10 @@ class MindTheMap:
             if not openai_api_key:
                 st.error("Please enter your OpenAI API key")
 
+            # Concatenate complxiety level with user input
+            user_input = f"{user_input}. Explain to me as if I'm a {complexity_level}."
             # Call generate_net() function.
-            self.text, nodes = self.controller(prompt=prompt, user=user_input, key=openai_api_key)
+            self.text, nodes= self.controller(prompt=get_prompt(n_nodes=node_count), user=user_input, key=openai_api_key)
 
             # Update text based on words in DataFrame
             for name, color in zip(nodes['Name'], nodes['Color']):
@@ -95,6 +130,7 @@ class MindTheMap:
                 st.error("Please enter your OpenAI API key")
 
             # Call generate_pptx() function.
+            self.display_text(self.text)
             self.controller_pptx(prompt=prompt_ppt, user=user_input, key=openai_api_key, filename=filename)
             # Convert pptx file to base64
             with open(f"{filename}.pptx", "rb") as file:
