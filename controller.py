@@ -97,7 +97,7 @@ def get_jsons(prompt, user, key):
         )
     except Exception as e:
         logging.error(str(e))
-        print("API error")
+        logging.info("API error")
         pass
     
     # turbo ChatCompletion resp
@@ -111,7 +111,7 @@ def df_to_net(df_nodes, df_edges):
     
     # Check if source or destination text is missing in nodes DataFrame
     missing_nodes = set(df_edges['Source'].unique()) | set(df_edges['Destination'].unique()) - set(df_nodes['Name'].unique())
-    print(missing_nodes)
+    logging.info(missing_nodes)
     # Create a DataFrame for the missing nodes
     missing_nodes_df = pd.DataFrame({
         'Name': list(missing_nodes),
@@ -119,12 +119,12 @@ def df_to_net(df_nodes, df_edges):
         'Color': df_nodes['Color'].sample(n=len(missing_nodes), replace=True).reset_index(drop=True),
         'Shape': 'dot'
     })
-    print("Missing Nodes")
-    print(missing_nodes_df)
+    logging.info("Missing Nodes")
+    logging.info(missing_nodes_df)
     # Concatenate existing nodes DataFrame with missing nodes DataFrame
     df_nodes = pd.concat([df_nodes, missing_nodes_df], ignore_index=True)
-    print("New nodes df after adding missing nodes")
-    print(df_nodes)
+    logging.info("New nodes df after adding missing nodes")
+    logging.info(df_nodes)
 
 
     for n in df_nodes.iterrows():
@@ -194,8 +194,8 @@ def generate_net(prompt, user, key):
     # net.save_graph("experiment.html")
     # Generate a unique filename based on user information
     user_hash = hashlib.md5(user.encode()).hexdigest()
-    print("Saving with user: " + user)
-    print("Saving with hash: " + user_hash)
+    logging.info("Default Saving with user: " + user)
+    logging.info("Default Saving with hash: " + user_hash)
     filename = f"experiment_{user_hash}.html"
     cache_file = os.path.join(cache_dir, filename)
     net.save_graph(cache_file)
@@ -203,8 +203,8 @@ def generate_net(prompt, user, key):
     logging.info("User input: " + user)
     try:
         jsons = get_jsons(prompt=prompt, user=user, key=key)
-        print(jsons)
-        print(prompt, user)
+        logging.info(jsons)
+        logging.info(prompt, user)
 
         match = re.search(r'\{.*\}', jsons)
         jsons = match.group(0)
@@ -215,8 +215,8 @@ def generate_net(prompt, user, key):
 
     except Exception as e:
         logging.error(str(e))
-        print(e)
-        print("JSON error")
+        logging.info(e)
+        logging.info("JSON error")
         pass
   
     
@@ -227,15 +227,15 @@ def generate_net(prompt, user, key):
         net = df_to_net(nodes, edges)
     except Exception as e:
         logging.error(str(e))
-        print("Graph error")
+        logging.info("Graph error")
         pass
 
     # net.show_buttons(filter_=['physics'])
     # net.save_graph("experiment.html")
 
     user_hash = hashlib.md5(user.encode()).hexdigest()
-    print("Saving with user: " + user)
-    print("Saving with hash: " + user_hash)
+    logging.info("Saving with user: " + user)
+    logging.info("Saving with hash: " + user_hash)
     filename = f"experiment_{user_hash}.html"
     cache_file = os.path.join(cache_dir, filename)
     net.save_graph(cache_file)
