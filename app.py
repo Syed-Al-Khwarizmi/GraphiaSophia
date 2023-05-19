@@ -10,7 +10,6 @@ import threading
 import concurrent.futures
 import streamlit as st
 import streamlit.components.v1 as components
-import extra_streamlit_components as stx
 
 from controller import generate_net, get_prompt
 from controller_pptx import generate_pptx, prompt_ppt
