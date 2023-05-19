@@ -96,7 +96,7 @@ class GraphiaSophia:
         # Create a number selector for the node count
         with col2:
             node_count = col2.number_input(
-            "Select the minimum number of nodes (5-20)",
+            "Select the target number of nodes (5-20)",
             min_value=5,
             max_value=20,
             value=10,
