@@ -35,19 +35,20 @@ class GraphiaSophia:
         st.sidebar.markdown(self.text, unsafe_allow_html=True)
     
     def clear_cache_directory(self):
-        # Sleep for 5 minutes
-        time.sleep(900)
-        while True:
-            # Clear the cache directory
-            for filename in os.listdir(self.cache_dir):
-                file_path = os.path.join(self.cache_dir, filename)
-                try:
-                    if os.path.isfile(file_path):
+        current_time = time.time()
+        expiration_time = 900  # 15 minutes in seconds
+
+        for filename in os.listdir(cache_dir):
+            file_path = os.path.join(cache_dir, filename)
+            try:
+                if os.path.isfile(file_path):
+                    file_creation_time = os.path.getctime(file_path)
+                    if current_time - file_creation_time >= expiration_time:
                         os.remove(file_path)
-                    elif os.path.isdir(file_path):
-                        shutil.rmtree(file_path)
-                except Exception as e:
-                    print(f"Failed to delete {file_path}: {str(e)}")
+                elif os.path.isdir(file_path):
+                    shutil.rmtree(file_path)
+            except Exception as e:
+                print(f"Failed to delete {file_path}: {str(e)}")
 
 
     def run(self):
