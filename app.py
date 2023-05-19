@@ -49,7 +49,7 @@ class GraphiaSophia:
                 elif os.path.isdir(file_path):
                     shutil.rmtree(file_path)
             except Exception as e:
-                print(f"Failed to delete {file_path}: {str(e)}")
+                logging.info(f"Failed to delete {file_path}: {str(e)}")
 
 
     def run(self):
@@ -96,7 +96,7 @@ class GraphiaSophia:
         # Create a number selector for the node count
         with col2:
             node_count = col2.number_input(
-            "Select the number of nodes (5-20)",
+            "Select the minimum number of nodes (5-20)",
             min_value=5,
             max_value=20,
             value=10,
@@ -142,8 +142,8 @@ class GraphiaSophia:
                 self.text = re.sub(pattern, f'<span style="color:{color}">{name}</span>', self.text, flags=re.IGNORECASE)
 
             # Display the text.
-            print("THIS GETS SHOWN JUUUUUST FIIIINE!!!")
-            print(self.text)
+            logging.info("THIS GETS SHOWN JUUUUUST FIIIINE!!!")
+            logging.info(self.text)
             self.display_text(self.text)
 
         # Call generate_pptx() function when Generate PPT button is clicked.
@@ -164,8 +164,8 @@ class GraphiaSophia:
             # Convert pptx file to base64
             # Generate a unique filename based on user information
             user_hash = hashlib.md5(user_input.encode()).hexdigest()
-            print("Saving with user: " + user_input)
-            print("Saving with hash: " + user_hash)
+            logging.info("Saving with user: " + user_input)
+            logging.info("Saving with hash: " + user_hash)
             filename = f"presentation_{user_hash}.pptx"
             cache_file = os.path.join(self.cache_dir, filename)
             with open(f"{cache_file}", "rb") as file:
@@ -184,11 +184,11 @@ class GraphiaSophia:
         user_hash = hashlib.md5(user_input.encode()).hexdigest()
         filename = f"experiment_{user_hash}.html"
         cache_file = os.path.join(self.cache_dir, filename)
-        print("Opening with user: " + user_input)
-        print("cache_file: " + cache_file)
+        logging.info("Opening with user: " + user_input)
+        logging.info("cache_file: " + cache_file)
         # If not exists the cache_file, then cache_file = "experiment.html"
         if not os.path.exists(cache_file):
-            print(f"cache_file {cache_file} does not exist")
+            logging.info(f"cache_file {cache_file} does not exist")
             cache_file = "./experiment.html"
         # Get the user's cookie value from the Streamlit request context
         with open(cache_file, "r") as HtmlFile:
