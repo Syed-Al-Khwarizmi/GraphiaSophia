@@ -187,6 +187,7 @@ class GraphiaSophia:
         print("cache_file: " + cache_file)
         # If not exists the cache_file, then cache_file = "experiment.html"
         if not os.path.exists(cache_file):
+            print(f"cache_file {cache_file} does not exist")
             cache_file = "./experiment.html"
         # Get the user's cookie value from the Streamlit request context
         with open(cache_file, "r") as HtmlFile:
