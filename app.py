@@ -38,8 +38,8 @@ class GraphiaSophia:
         current_time = time.time()
         expiration_time = 900  # 15 minutes in seconds
 
-        for filename in os.listdir(cache_dir):
-            file_path = os.path.join(cache_dir, filename)
+        for filename in os.listdir(self.cache_dir):
+            file_path = os.path.join(self.cache_dir, filename)
             try:
                 if os.path.isfile(file_path):
                     file_creation_time = os.path.getctime(file_path)
