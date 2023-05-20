@@ -1,3 +1,4 @@
+import re
 import openai
 from pptx import Presentation
 import json
@@ -66,7 +67,14 @@ def get_response(prompt, user, key):
 
 
 def create_pptx_from_json(json_text, user):
+    
+    #Extract the JSON
+    logging.info("JSON before extraction\n {}".format(json_text))
+    # Remove redundant text
+    json_text = re.search(r'\{.*\}', json_text, re.DOTALL).group(0)
+    logging.info("JSON after extraction\n {}".format(json_text))
     # Load the JSON
+    # data = json_text
     data = json.loads(json_text)
 
     # Initialize the PowerPoint presentation
