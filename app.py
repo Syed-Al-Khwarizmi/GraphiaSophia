@@ -74,7 +74,7 @@ class GraphiaSophia:
                 }
                 </style>
             """, unsafe_allow_html=True)
-        st.title("GraphiaSophiaVishal")
+        st.title("GraphiaSophia")
 
         # # Create a text input field where users can enter text.
         # user_input = st.text_area("Enter your text here", max_chars=350)
