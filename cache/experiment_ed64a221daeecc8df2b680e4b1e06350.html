@@ -1,0 +1,108 @@
+<html>
+<head>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vis-network@latest/styles/vis-network.css" type="text/css" />
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vis-network@latest/dist/vis-network.min.js"> </script>
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+
+<style type="text/css">
+
+        #mynetwork {
+            width: 100%;
+            height: 600px;
+            background-color: #ffffff;
+            border: 1px solid lightgray;
+            position: relative;
+            float: left;
+        }
+
+        
+
+        
+
+        
+</style>
+
+</head>
+
+<body>
+<div id = "mynetwork"></div>
+
+
+<script type="text/javascript">
+
+    // initialize global variables.
+    var edges;
+    var nodes;
+    var network; 
+    var container;
+    var options, data;
+
+    
+    // This method is responsible for drawing the graph, returns the drawn network
+    function drawGraph() {
+        var container = document.getElementById('mynetwork');
+        
+        
+
+        // parsing and collecting nodes and edges from the python
+        nodes = new vis.DataSet([{"color": "#6495ED", "id": "Graduate College Student", "label": "Graduate College Student", "physics": false, "shape": "dot"}, {"color": "#FFD700", "id": "DevOps", "label": "DevOps", "physics": false, "shape": "dot"}, {"color": "#009E60", "id": "Continuous Integration", "label": "Continuous Integration", "physics": false, "shape": "dot"}, {"color": "#E30B5C", "id": "Continuous Delivery", "label": "Continuous Delivery", "physics": false, "shape": "dot"}, {"color": "#FF7F50", "id": "Continuous Deployment", "label": "Continuous Deployment", "physics": false, "shape": "dot"}, {"color": "#5D3FD3", "id": "Monitoring", "label": "Monitoring", "physics": false, "shape": "dot"}, {"color": "#CC5500", "id": "Automation", "label": "Automation", "physics": false, "shape": "dot"}, {"color": "#40E0D0", "id": "Collaboration", "label": "Collaboration", "physics": false, "shape": "dot"}, {"color": "#FF5F1F", "id": "Agile", "label": "Agile", "physics": false, "shape": "dot"}, {"color": "#228B22", "id": "Cloud Computing", "label": "Cloud Computing", "physics": false, "shape": "dot"}, {"color": "#FFBF00", "id": "Infrastructure as Code", "label": "Infrastructure as Code", "physics": false, "shape": "dot"}]);
+        edges = new vis.DataSet([{"arrowStrikethrough": false, "arrows": "to", "from": "Graduate College Student", "physics": true, "title": "Learns about", "to": "DevOps"}, {"arrowStrikethrough": false, "arrows": "to", "from": "DevOps", "physics": true, "title": "Involves", "to": "Continuous Integration"}, {"arrowStrikethrough": false, "arrows": "to", "from": "DevOps", "physics": true, "title": "Involves", "to": "Continuous Delivery"}, {"arrowStrikethrough": false, "arrows": "to", "from": "DevOps", "physics": true, "title": "Involves", "to": "Continuous Deployment"}, {"arrowStrikethrough": false, "arrows": "to", "from": "DevOps", "physics": true, "title": "Involves", "to": "Monitoring"}, {"arrowStrikethrough": false, "arrows": "to", "from": "DevOps", "physics": true, "title": "Involves", "to": "Automation"}, {"arrowStrikethrough": false, "arrows": "to", "from": "DevOps", "physics": true, "title": "Involves", "to": "Collaboration"}, {"arrowStrikethrough": false, "arrows": "to", "from": "DevOps", "physics": true, "title": "Involves", "to": "Agile"}, {"arrowStrikethrough": false, "arrows": "to", "from": "DevOps", "physics": true, "title": "Involves", "to": "Cloud Computing"}, {"arrowStrikethrough": false, "arrows": "to", "from": "DevOps", "physics": true, "title": "Involves", "to": "Infrastructure as Code"}]);
+
+        // adding nodes and edges to the graph
+        data = {nodes: nodes, edges: edges};
+
+        var options = {
+    "configure": {
+        "enabled": false
+    },
+    "edges": {
+        "color": {
+            "inherit": true
+        },
+        "smooth": {
+            "enabled": true,
+            "type": "dynamic"
+        }
+    },
+    "interaction": {
+        "dragNodes": true,
+        "hideEdgesOnDrag": false,
+        "hideNodesOnDrag": false
+    },
+    "physics": {
+        "enabled": true,
+        "stabilization": {
+            "enabled": true,
+            "fit": true,
+            "iterations": 1000,
+            "onlyDynamicEdges": false,
+            "updateInterval": 50
+        }
+    }
+};
+        
+        
+
+        
+
+        network = new vis.Network(container, data, options);
+	 
+        
+
+
+        
+
+        return network;
+
+    }
+
+    drawGraph();
+
+</script>
+</body>
+</html>

@@ -96,9 +96,9 @@ class GraphiaSophia:
         # Create a number selector for the node count
         with col2:
             node_count = col2.number_input(
-            "Select the target number of nodes (5-10)",
+            "Select the graph complexity (5-20)",
             min_value=5,
-            max_value=10,
+            max_value=20,
             value=10,
             step=1
         )
@@ -107,7 +107,7 @@ class GraphiaSophia:
         with col2:
             complexity_level = col2.selectbox(
             "Select your complexity level",
-            options=["1st Grader", "5th Grader", "Middle Schooler", "High Schooler", "Graduate Level", "Postgraduate Level"]
+            options=["Elementary School", "Middle School", "High School", "Graduate College", "Postgraduate College"]
         )
 
         # Create a text input field for the OpenAI API key.
@@ -130,7 +130,7 @@ class GraphiaSophia:
                 st.error("Please enter your OpenAI API key")
 
             # Concatenate complxiety level with user input
-            user_input = f"Scenario: {user_input}. Explain to me as if I'm a {complexity_level}."
+            user_input = f"Scenario: {user_input}. Explain for a {complexity_level} student."
             # Call generate_net() function.
             self.text, nodes= self.controller(prompt=get_prompt(n_nodes=node_count), user=user_input, key=openai_api_key)
 
